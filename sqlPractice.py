@@ -4,9 +4,15 @@
 # Description: A simple program to practice SQLAlchemy and use of databases
 
 from sqlalchemy import (
+    Column,
     create_engine,
+    Integer,
+    MetaData,
+    String,
+    Table,
     text,
 )
+from sqlalchemy.orm import Session
 
 engine = create_engine("sqlite+pysqlite:///:memory:", echo=True, future=True)
 
@@ -37,3 +43,25 @@ with engine.connect() as conn:
     result = conn.execute(stmt)
     for row in result:
         print(f"x: {row.x}  y: {row.y}")
+
+# Executing with an ORM Session
+stmt = text("SELECT x, y FROM some_table WHERE y > :y ORDER BY x, y").bindparams(y=6)
+with Session(engine) as session:
+    result = session.execute(stmt)
+    for row in result:
+        print(f"x: {row.x}  y: {row.y}")
+
+with Session(engine) as session:
+    result = session.execute(text("UPDATE some_table SET y=:y WHERE x=:x"), [{"x": 9, "y": 11}, {"x": 1, "y": 20}])
+    session.commit()
+
+# Working with Database Metadata
+metadata = MetaData()
+
+user_table = Table(
+    "user_account",
+    metadata,
+    Column('id', Integer, primary_key=True),
+    Column('name', String(30)),
+    Column('fullname', String)
+)
