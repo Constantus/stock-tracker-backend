@@ -6,6 +6,7 @@
 from sqlalchemy import (
     Column,
     create_engine,
+    ForeignKey,
     Integer,
     MetaData,
     String,
@@ -65,3 +66,13 @@ user_table = Table(
     Column('name', String(30)),
     Column('fullname', String)
 )
+
+address_table = Table(
+    "address",
+    metadata,
+    Column('id', Integer, primary_key=True),
+    Column('user_id', ForeignKey('user_account.id'), nullable=False),
+    Column('email_address', String, nullable=False)
+)
+
+metadata.create_all(engine)
